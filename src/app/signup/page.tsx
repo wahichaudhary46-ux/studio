@@ -42,101 +42,91 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/30 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-indigo-500/5 to-transparent"></div>
-      </div>
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Neon grid background */}
+      <div className="absolute inset-0 bg-[radial-gradient(#00ffff11_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
+      
+      {/* Animated neon orbs */}
+      <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-500 rounded-full blur-[100px] opacity-20 animate-pulse"></div>
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-600 rounded-full blur-[120px] opacity-20 animate-pulse delay-700"></div>
 
-      <div className="relative perspective-1000 w-full max-w-md">
-        <div className="relative transform-gpu transition-all duration-500 hover:rotate-y-2 hover:rotate-x-2 hover:shadow-2xl">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-[35px] blur-2xl transform translate-y-4"></div>
+      <div className="relative w-full max-w-md">
+        {/* Neon glow card */}
+        <div className="relative bg-black/60 backdrop-blur-xl rounded-3xl border border-cyan-500/30 shadow-[0_0_30px_rgba(0,255,255,0.2)] transition-all duration-500 hover:shadow-[0_0_50px_rgba(0,255,255,0.4)]">
+          <div className="absolute -inset-[1px] bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-3xl blur-md opacity-30 group-hover:opacity-50 transition duration-1000"></div>
           
-          <div className="relative bg-white/5 backdrop-blur-xl border border-white/20 rounded-[35px] p-8 shadow-2xl shadow-black/30 transition-all duration-300 hover:shadow-blue-500/10">
-            <div className="text-center mb-6">
-              <h1 className="text-5xl font-black bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent">
-                CREATE ACCOUNT
+          <div className="relative p-8">
+            {/* Neon Text Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-5xl font-black tracking-wider">
+                <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent animate-pulse">
+                  CREATE
+                </span>
+                <span className="text-white"> </span>
+                <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  ACCOUNT
+                </span>
               </h1>
-              <div className="h-1 w-20 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mt-3 rounded-full"></div>
+              <div className="h-[2px] w-32 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto mt-3 rounded-full shadow-[0_0_8px_#00ffff]"></div>
             </div>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-2xl backdrop-blur-sm">
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl backdrop-blur-sm">
                 <p className="text-red-400 text-xs text-center font-medium">{error}</p>
               </div>
             )}
 
             <form onSubmit={handleSignup} className="space-y-5">
-              <div className="group">
+              <div>
                 <input
                   type="email"
                   placeholder="Email ID"
                   required
-                  className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-gray-400 outline-none transition-all duration-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full p-4 bg-white/5 border border-cyan-500/30 rounded-xl text-white placeholder:text-gray-400 outline-none transition-all duration-300 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 focus:shadow-[0_0_12px_#00ffff]"
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   disabled={loading}
                 />
               </div>
-
-              <div className="group">
+              <div>
                 <input
                   type="password"
                   placeholder="Password (min. 6 characters)"
                   required
-                  className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-gray-400 outline-none transition-all duration-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full p-4 bg-white/5 border border-cyan-500/30 rounded-xl text-white placeholder:text-gray-400 outline-none transition-all duration-300 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 focus:shadow-[0_0_12px_#00ffff]"
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   disabled={loading}
                 />
               </div>
-
-              <div className="group">
+              <div>
                 <input
                   type="password"
                   placeholder="Confirm Password"
                   required
-                  className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-gray-400 outline-none transition-all duration-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full p-4 bg-white/5 border border-cyan-500/30 rounded-xl text-white placeholder:text-gray-400 outline-none transition-all duration-300 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 focus:shadow-[0_0_12px_#00ffff]"
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   disabled={loading}
                 />
               </div>
-
               <button
                 type="submit"
                 disabled={loading}
-                className="relative w-full group overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-[1px] transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 disabled:opacity-70"
+                className="relative w-full group overflow-hidden rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 p-[1px] transition-all duration-300 hover:shadow-[0_0_20px_#00ffff] disabled:opacity-70"
               >
-                <div className="relative flex items-center justify-center gap-2 w-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl py-4 text-white font-black text-lg transition-all duration-300 group-hover:scale-[1.02]">
-                  {loading ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  ) : (
-                    "SIGN UP"
-                  )}
+                <div className="relative flex items-center justify-center gap-2 w-full rounded-xl py-4 text-white font-black text-lg tracking-wider group-hover:scale-[1.02] transition-all">
+                  {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : "SIGN UP"}
                 </div>
               </button>
             </form>
 
-            <p className="text-gray-500 text-center mt-6 text-sm border-t border-white/10 pt-5">
+            <p className="text-gray-400 text-center mt-6 text-sm border-t border-cyan-500/30 pt-5 font-mono">
               Already have an account?{' '}
-              <Link href="/login" className="text-blue-500 font-bold hover:text-blue-400 transition-colors">
+              <Link href="/login" className="text-cyan-400 font-bold hover:text-cyan-300 transition-colors hover:shadow-[0_0_6px_cyan]">
                 Log In
               </Link>
             </p>
           </div>
         </div>
       </div>
-      <style jsx>{`
-        .perspective-1000 {
-          perspective: 1000px;
-        }
-        .rotate-y-2 {
-          transform: rotateY(2deg) rotateX(2deg);
-        }
-        .hover\\:rotate-y-2:hover {
-          transform: rotateY(2deg) rotateX(2deg);
-        }
-      `}</style>
     </div>
   );
 }
