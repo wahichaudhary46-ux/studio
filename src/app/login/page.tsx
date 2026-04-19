@@ -12,10 +12,10 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!loading && user) {
-      router.replace('/dashboard');
+      router.replace('/');
     }
   }, [user, loading, router]);
-  
+
   const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px" {...props}>
       <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
@@ -34,17 +34,19 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-background p-8">
-      <div className="flex flex-col items-center text-center">
-        <h1 className="font-headline text-5xl font-bold tracking-tight text-primary md:text-6xl">
-          SparkMemo
-        </h1>
-        <p className="mt-4 max-w-xl text-lg text-foreground/80">
-          Capture your thoughts, ideas, and reminders. Let our AI provide you with instant, concise summaries.
-        </p>
-        <Button size="lg" className="mt-8" onClick={signInWithGoogle}>
-          <GoogleIcon className="mr-2" />
-          Sign in with Google
+    <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+      <div className="w-full max-w-md text-center rounded-3xl border border-border bg-card p-8">
+        <h1 className="text-4xl font-black text-foreground mb-2">LIBRARY <span className="text-primary">PRO</span></h1>
+        <p className="text-muted-foreground text-sm mb-8">Welcome! Please login to continue.</p>
+        
+        <Button 
+          onClick={signInWithGoogle}
+          size="lg"
+          className="w-full h-auto py-3 text-base"
+          variant="outline"
+        >
+          <GoogleIcon className="mr-2 h-6 w-6" />
+          Continue with Google
         </Button>
       </div>
     </main>
