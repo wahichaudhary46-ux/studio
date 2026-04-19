@@ -9,6 +9,7 @@ const studentProfileSchema = z.object({
   uid: z.string().min(1),
   email: z.string().email(),
   name: z.string().min(1, "Name is required."),
+  phone: z.string().min(1, "Phone is required."),
   profilePic: z.string().nullable(),
   dob: z.string().min(1, "Date of birth is required."),
   gender: z.string().min(1, "Gender is required."),
@@ -40,7 +41,6 @@ export async function completeOnboardingAction(formData: StudentProfileInput) {
             ...data,
             uid,
             lastProfileUpdate: data.lastProfileUpdate ? new Date(data.lastProfileUpdate) : null,
-            createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
         }, { merge: true });
         

@@ -17,7 +17,7 @@ export default function RootPage() {
         const checkUserOnboarding = async () => {
           const userDocRef = doc(db, 'students', user.uid);
           const userDoc = await getDoc(userDocRef);
-          if (userDoc.exists()) {
+          if (userDoc.exists() && userDoc.data().name) {
             router.replace('/dashboard');
           } else {
             router.replace('/onboarding');

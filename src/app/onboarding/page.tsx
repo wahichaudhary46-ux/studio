@@ -25,6 +25,7 @@ import { Loader2 } from "lucide-react";
 
 const initialFormData = {
   name: "",
+  phone: "",
   profilePic: null as string | null,
   dob: "",
   gender: "",
@@ -54,20 +55,20 @@ export default function OnboardingPage() {
         const saved = localStorage.getItem(`onboardingData_${user.uid}`);
         let existingData: Partial<typeof initialFormData> = {};
         
+        const userDocRef = doc(db, 'students', user.uid);
+        const docSnap = await getDoc(userDocRef);
+
         if (saved) {
           existingData = JSON.parse(saved);
-        } else {
-          const userDocRef = doc(db, 'students', user.uid);
-          const docSnap = await getDoc(userDocRef);
-          if (docSnap.exists()) {
+        } else if (docSnap.exists()) {
             const dbData = docSnap.data();
             existingData = { 
               name: dbData.name || '',
+              phone: dbData.phone || '',
               profilePic: dbData.profilePic || null,
             };
-          }
         }
-        setFormData(prev => ({...prev, ...existingData}));
+        setFormData(prev => ({...prev, ...existingData, phone: docSnap.data()?.phone || prev.phone}));
       };
       fetchData();
     }
@@ -129,7 +130,7 @@ export default function OnboardingPage() {
         toast({ variant: "destructive", title: "Authentication Error", description: "You must be logged in." });
         return;
     }
-    const mandatory = ["name", "dob", "gender", "bio", "class", "exam", "stream", "city", "state", "country"];
+    const mandatory = ["name", "dob", "gender", "bio", "class", "exam", "stream", "city", "state", "country", "phone"];
     for (let field of mandatory) {
       if (!formData[field as keyof typeof formData]) {
         toast({ variant: "destructive", title: "Missing Information", description: `Please fill out the ${field} field.` });
@@ -186,9 +187,15 @@ export default function OnboardingPage() {
              {formData.profilePic && typeof formData.profilePic === 'string' && !formData.profilePic.startsWith('http') && <p className="text-sm text-muted-foreground">Current file: {formData.profilePic}</p>}
           </div>
 
-          <div className="space-y-2">
-            <Label>Email</Label>
-            <Input value={user.email || ""} readOnly className="bg-muted" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Phone Number</Label>
+              <Input value={formData.phone} readOnly className="bg-muted" />
+            </div>
+             <div className="space-y-2">
+              <Label>Email (for authentication)</Label>
+              <Input value={user.email || ""} readOnly className="bg-muted" />
+            </div>
           </div>
 
           <div className="space-y-2">

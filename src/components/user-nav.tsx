@@ -48,7 +48,7 @@ export function UserNav() {
   };
 
   const displayName = profile?.name || user?.displayName || 'User';
-  const displayEmail = user?.email;
+  const displayPhone = profile?.phone;
   const photoURL = profile?.profilePic || user?.photoURL;
 
   if (!user) {
@@ -69,7 +69,7 @@ export function UserNav() {
           </Avatar>
           <div className="flex flex-col items-start space-y-1 truncate">
             <p className="text-sm font-medium leading-none truncate">{displayName}</p>
-            {displayEmail && <p className="text-xs leading-none text-muted-foreground truncate">{displayEmail}</p>}
+            {displayPhone && <p className="text-xs leading-none text-muted-foreground truncate">{displayPhone}</p>}
           </div>
         </Button>
       </DropdownMenuTrigger>
@@ -77,7 +77,7 @@ export function UserNav() {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{displayName}</p>
-            {displayEmail && <p className="text-xs leading-none text-muted-foreground">{displayEmail}</p>}
+            {displayPhone && <p className="text-xs leading-none text-muted-foreground">{displayPhone}</p>}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

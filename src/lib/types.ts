@@ -14,6 +14,7 @@ export interface StudentProfile {
   uid: string;
   email: string;
   name: string;
+  phone?: string;
   profilePic?: string | null;
   dob: string;
   gender: string;
