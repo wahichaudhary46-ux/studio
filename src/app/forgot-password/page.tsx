@@ -18,19 +18,19 @@ export default function ForgotPasswordPage() {
     setError('');
 
     if (!email) {
-      setError('Please enter your email address.');
+      setError('Kripya apna email address dalein.');
       return;
     }
 
     setIsLoading(true);
     try {
       await sendPasswordResetEmail(auth, email);
-      setMessage('Password reset email sent! Check your inbox (and spam folder).');
+      setMessage('Password reset link aapke email par bhej diya gaya hai. Apna inbox (aur spam folder) check karein.');
     } catch (err: any) {
       if (err.code === 'auth/user-not-found') {
-        setError('No account found with this email address.');
+        setError('Is email address se koi account nahi mila.');
       } else {
-        setError('Failed to send password reset email. Please try again.');
+        setError('Password reset email bhejne mein asamarth. Kripya dobara prayas karein.');
       }
     } finally {
       setIsLoading(false);
@@ -38,78 +38,36 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Neon grid background */}
-      <div className="absolute inset-0 bg-[radial-gradient(#00ffff11_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
-      
-      {/* Animated neon orbs */}
-      <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-500 rounded-full blur-[100px] opacity-20 animate-pulse"></div>
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-600 rounded-full blur-[120px] opacity-20 animate-pulse delay-700"></div>
-
-      <div className="relative w-full max-w-md">
-        {/* Neon glow card */}
-        <div className="relative bg-black/60 backdrop-blur-xl rounded-3xl border border-cyan-500/30 shadow-[0_0_30px_rgba(0,255,255,0.2)] transition-all duration-500 hover:shadow-[0_0_50px_rgba(0,255,255,0.4)]">
-          <div className="absolute -inset-[1px] bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-3xl blur-md opacity-30 group-hover:opacity-50 transition duration-1000"></div>
-          
-          <div className="relative p-8">
-            {/* Neon Text Header */}
-            <div className="text-center mb-8">
-               <h1 className="text-4xl font-black tracking-wider bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Reset Password
-              </h1>
-              <p className="text-gray-400 mt-2 text-sm font-mono">Enter your email to receive a reset link.</p>
-               <div className="h-[2px] w-24 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto mt-3 rounded-full shadow-[0_0_8px_#00ffff]"></div>
-            </div>
-
-            {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl backdrop-blur-sm">
-                <p className="text-red-400 text-xs text-center font-medium">{error}</p>
-              </div>
-            )}
-
-            {message && (
-              <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 rounded-xl backdrop-blur-sm">
-                <p className="text-green-400 text-xs text-center font-medium">{message}</p>
-              </div>
-            )}
-
-            <form onSubmit={handleResetPassword} className="space-y-5">
-              <div>
-                <input
-                  type="email"
-                  placeholder="Your Email ID"
-                  required
-                  className="w-full p-4 bg-white/5 border border-cyan-500/30 rounded-xl text-white placeholder:text-gray-400 outline-none transition-all duration-300 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 focus:shadow-[0_0_12px_#00ffff]"
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading || !!message}
-                className="relative w-full group overflow-hidden rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 p-[1px] transition-all duration-300 hover:shadow-[0_0_20px_#00ffff] disabled:opacity-70"
-              >
-                <div className="relative flex items-center justify-center gap-2 w-full rounded-xl py-4 text-white font-black text-lg tracking-wider group-hover:scale-[1.02] transition-all">
-                  {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  ) : (
-                    <>
-                      <Mail className="w-5 h-5" />
-                      Send Reset Link
-                    </>
-                  )}
-                </div>
-              </button>
-            </form>
-
-            <p className="text-gray-400 text-center mt-6 text-sm border-t border-cyan-500/30 pt-5 font-mono">
-              Remembered your password?{' '}
-              <Link href="/login" className="text-cyan-400 font-bold hover:text-cyan-300 transition-colors hover:shadow-[0_0_6px_cyan]">
-                Log In
-              </Link>
-            </p>
-          </div>
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+      <div className="bg-white/5 p-8 rounded-[35px] border border-white/10 w-full max-w-md">
+        <h1 className="text-4xl font-black text-white mb-2 text-center underline decoration-blue-500">RESET <span className="text-blue-500">PASSWORD</span></h1>
+        <p className="text-gray-500 text-[10px] mb-8 text-center font-bold tracking-[3px] uppercase">Recover Your Account</p>
+        
+        {message && <p className="bg-green-500/10 text-green-400 text-[10px] p-3 rounded-xl text-center mb-4 font-bold border border-green-500/20">{message}</p>}
+        {error && <p className="bg-red-500/10 text-red-500 text-[10px] p-3 rounded-xl text-center mb-4 font-bold border border-red-500/20">{error}</p>}
+        
+        {!message && (
+          <form onSubmit={handleResetPassword} className="space-y-4">
+            <input 
+              type="email" 
+              placeholder="Your Registered Gmail Address" 
+              required 
+              className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-blue-500 font-bold" 
+              onChange={(e) => setEmail(e.target.value)} 
+              disabled={isLoading} 
+            />
+            <button 
+              type="submit" 
+              className="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-blue-600/20 hover:scale-[1.02] transition-all disabled:opacity-70" 
+              disabled={isLoading}
+            >
+              {isLoading ? 'SENDING...' : 'SEND RESET LINK'}
+            </button>
+          </form>
+        )}
+        
+        <div className="mt-8 pt-6 border-t border-white/5 text-center">
+           <p className="text-gray-500 text-xs">Remembered it? <Link href="/login" className="text-blue-500 font-bold ml-1">Go back to Login</Link></p>
         </div>
       </div>
     </div>
