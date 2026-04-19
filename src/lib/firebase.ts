@@ -3,11 +3,13 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig: FirebaseOptions = {
-  projectId: "studio-2192908836-bf830",
-  appId: "1:455686310447:web:51a4b51c636edb587ad4da",
-  apiKey: "AIzaSyC816JykYWBH9x6KPSPGMfZPdH5P_IXDxo",
-  authDomain: "studio-2192908836-bf830.firebaseapp.com",
-  messagingSenderId: "455686310447"
+  apiKey: "AIzaSyCRPkwRT0ahqYrnq45qVccAskVWPLKIF1U",
+  authDomain: "nexa-library.firebaseapp.com",
+  projectId: "nexa-library",
+  storageBucket: "nexa-library.appspot.com",
+  messagingSenderId: "513211376038",
+  appId: "1:513211376038:web:fb25e84e89a9512cda2f67",
+  measurementId: "G-RRS84WFGEM"
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
