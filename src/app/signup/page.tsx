@@ -48,15 +48,11 @@ export default function SignUpPage() {
         updatedAt: serverTimestamp(),
       }, { merge: true });
       router.push('/onboarding');
-    } catch (err: any) {
-      console.error(err);
-      if (err.code === 'auth/email-already-in-use') {
-        setError("This phone number is already registered. Please log in instead.");
-      } else if (err.code === 'auth/invalid-email') {
-        setError("Please enter a valid phone number.");
-      }
-       else {
-        setError("Failed to create an account. Please try again.");
+    } catch (error: any) {
+      if (error.code === 'auth/email-already-in-use') {
+        alert("यह नंबर पहले से रजिस्टर है! कृपया लॉगिन करें।");
+      } else {
+        alert("Error: " + error.message);
       }
     } finally {
       setIsLoading(false);
