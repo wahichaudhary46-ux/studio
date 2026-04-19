@@ -34,15 +34,15 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md text-center rounded-3xl border border-border bg-card p-8">
-        <h1 className="text-4xl font-black text-foreground mb-2">LIBRARY <span className="text-primary">PRO</span></h1>
-        <p className="text-muted-foreground text-sm mb-8">Welcome! Please login to continue.</p>
+    <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 p-4">
+      <div className="w-full max-w-md text-center rounded-3xl border border-white/10 bg-white/5 p-8">
+        <h1 className="text-4xl font-black text-white mb-2">LIBRARY <span className="text-blue-500">PRO</span></h1>
+        <p className="text-gray-400 text-sm mb-8">Welcome! Please login to continue.</p>
         
         <Button 
           onClick={signInWithGoogle}
           size="lg"
-          className="w-full h-auto py-3 text-base"
+          className="w-full h-auto py-3 text-base bg-white text-black font-bold flex items-center justify-center gap-3 hover:bg-gray-200 transition"
           variant="outline"
         >
           <GoogleIcon className="mr-2 h-6 w-6" />

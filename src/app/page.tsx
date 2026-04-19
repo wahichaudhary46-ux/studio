@@ -15,15 +15,12 @@ export default function RootPage() {
     if (!loading) {
       if (user) {
         const checkUserOnboarding = async () => {
-          // In a real app, you'd want to ensure you have a 'users' collection
-          const userDocRef = doc(db, 'users', user.uid);
+          const userDocRef = doc(db, 'students', user.uid);
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
             router.replace('/dashboard');
           } else {
-            // This is a placeholder for a new user onboarding flow
-            // You can create a document for the new user here
-            router.replace('/dashboard'); // Temporarily redirecting to dashboard
+            router.replace('/onboarding');
           }
         };
         checkUserOnboarding();

@@ -9,3 +9,23 @@ export interface Note {
   updatedAt: Timestamp;
   userId: string;
 }
+
+export interface StudentProfile {
+  uid: string;
+  email: string;
+  name: string;
+  profilePic?: string | null;
+  dob: string;
+  gender: string;
+  admissionNumber?: string;
+  bio: string;
+  class: string;
+  exam: string;
+  stream: string;
+  city: string;
+  state: string;
+  country: string;
+  lastProfileUpdate?: Timestamp | null;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
