@@ -51,7 +51,7 @@ export default function SignUpPage() {
     } catch (err: any) {
       console.error(err);
       if (err.code === 'auth/email-already-in-use') {
-        setError("This phone number is already registered.");
+        setError("This phone number is already registered. Please log in instead.");
       } else if (err.code === 'auth/invalid-email') {
         setError("Please enter a valid phone number.");
       }
