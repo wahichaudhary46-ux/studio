@@ -41,8 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider value={value}>
       {loading ? (
-        <div className="flex h-screen w-full items-center justify-center">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/30">
+            <Loader2 className="h-12 w-12 animate-spin text-cyan-400" />
         </div>
       ) : children}
     </AuthContext.Provider>

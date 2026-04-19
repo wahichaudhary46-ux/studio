@@ -19,7 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2 } from "lucide-react";
 
@@ -68,7 +67,7 @@ export default function OnboardingPage() {
               profilePic: dbData.profilePic || null,
             };
         }
-        setFormData(prev => ({...prev, ...existingData, phone: docSnap.data()?.phone || prev.phone}));
+        setFormData(prev => ({...prev, ...existingData, phone: docSnap.data()?.phone || prev.phone, email: user.email}));
       };
       fetchData();
     }
@@ -153,138 +152,137 @@ export default function OnboardingPage() {
 
   if (loading || !user) {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/30">
+        <Loader2 className="h-12 w-12 animate-spin text-cyan-400" />
       </div>
     );
   }
 
+  const inputStyles = "w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-400 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed";
+
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>Complete Your Profile</CardTitle>
-          <CardDescription>Fill in the details below to get started.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-4">
-            {formData.profilePic && (
-              <Avatar className="h-16 w-16">
-                <AvatarImage src={formData.profilePic} alt={formData.name} />
-                <AvatarFallback>{formData.name?.charAt(0)}</AvatarFallback>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/30 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
+      <div className="relative bg-white/5 backdrop-blur-xl border border-white/20 rounded-[35px] p-6 sm:p-8 shadow-2xl w-full max-w-3xl">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+            Complete Your Profile
+          </h1>
+          <p className="mt-2 text-gray-400">Fill in the details below to finalize your account.</p>
+          <div className="h-1 w-20 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto mt-4 rounded-full shadow-[0_0_6px_#00ffff]"></div>
+        </div>
+
+        <div className="space-y-6">
+          <div className="flex items-center gap-6">
+            <div className="relative">
+              <Avatar className="h-20 w-20 border-2 border-cyan-500/50">
+                <AvatarImage src={formData.profilePic || undefined} alt={formData.name} />
+                <AvatarFallback className="bg-white/10 text-cyan-400 text-2xl font-bold">
+                  {formData.name?.charAt(0)}
+                </AvatarFallback>
               </Avatar>
-            )}
+              <Input id="profilePic" type="file" accept="image/*" onChange={(e) => handleNamePicChange("profilePic", e.target.files?.[0]?.name || null)} disabled={!canUpdateNamePic() && !!formData.profilePic} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+            </div>
             <div className="space-y-2 flex-1">
-              <Label htmlFor="name">Name *</Label>
-              <Input id="name" value={formData.name} onChange={(e) => handleNamePicChange("name", e.target.value)} disabled={!canUpdateNamePic() && formData.name !== ""} />
-              {!canUpdateNamePic() && formData.name && <p className="text-xs text-destructive">Name can be changed only after 1 year.</p>}
+              <Label htmlFor="name" className="text-sm font-semibold text-gray-300">Name *</Label>
+              <Input id="name" value={formData.name} onChange={(e) => handleNamePicChange("name", e.target.value)} disabled={!canUpdateNamePic() && formData.name !== ""} className={inputStyles} />
+              {!canUpdateNamePic() && formData.name && <p className="text-xs text-red-400 mt-1">Name can be changed only once a year.</p>}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-gray-300">Phone Number</Label>
+              <Input value={formData.phone} readOnly className={`${inputStyles} cursor-not-allowed bg-white/10`} />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-gray-300">Email (for authentication)</Label>
+              <Input value={user.email || ""} readOnly className={`${inputStyles} cursor-not-allowed bg-white/10`} />
             </div>
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="profilePic">Update Profile Picture</Label>
-            <Input id="profilePic" type="file" accept="image/*" onChange={(e) => handleNamePicChange("profilePic", e.target.files?.[0]?.name || null)} disabled={!canUpdateNamePic() && !!formData.profilePic} />
-             {formData.profilePic && typeof formData.profilePic === 'string' && !formData.profilePic.startsWith('http') && <p className="text-sm text-muted-foreground">Current file: {formData.profilePic}</p>}
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label>Phone Number</Label>
-              <Input value={formData.phone} readOnly className="bg-muted" />
+              <Label htmlFor="dob" className="text-sm font-semibold text-gray-300">Date of Birth *</Label>
+              <Input id="dob" type="date" value={formData.dob} onChange={(e) => updateField("dob", e.target.value)} className={inputStyles} />
             </div>
-             <div className="space-y-2">
-              <Label>Email (for authentication)</Label>
-              <Input value={user.email || ""} readOnly className="bg-muted" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="dob">Date of Birth *</Label>
-            <Input id="dob" type="date" value={formData.dob} onChange={(e) => updateField("dob", e.target.value)} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="gender">Gender *</Label>
-            <Select value={formData.gender} onValueChange={(value) => updateField("gender", value)}>
-              <SelectTrigger id="gender"><SelectValue placeholder="Select gender" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Male">Male</SelectItem>
-                <SelectItem value="Female">Female</SelectItem>
-                <SelectItem value="Other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Admission Number</Label>
-            <Input value={formData.admissionNumber} readOnly className="bg-muted" placeholder="Will be assigned by admin"/>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="bio">Bio *</Label>
-            <Textarea id="bio" value={formData.bio} onChange={(e) => updateField("bio", e.target.value)} maxLength={150} placeholder="Tell us a bit about yourself" />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="class">Class *</Label>
-            <Select value={formData.class} onValueChange={(value) => { updateField("class", value); updateField("exam", ""); }}>
-              <SelectTrigger id="class"><SelectValue placeholder="Select class" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="9">9th</SelectItem>
-                <SelectItem value="10">10th</SelectItem>
-                <SelectItem value="11">11th</SelectItem>
-                <SelectItem value="12">12th</SelectItem>
-                <SelectItem value="Competitive">Competitive</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {formData.class && (
             <div className="space-y-2">
-              <Label htmlFor="exam">Exam *</Label>
-              <Select value={formData.exam} onValueChange={(value) => updateField("exam", value)}>
-                <SelectTrigger id="exam"><SelectValue placeholder="Select exam" /></SelectTrigger>
-                <SelectContent>
-                  {getExamOptions().map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
-                </SelectContent>
+              <Label htmlFor="gender" className="text-sm font-semibold text-gray-300">Gender *</Label>
+              <Select value={formData.gender} onValueChange={(value) => updateField("gender", value)}>
+                <SelectTrigger id="gender" className={inputStyles}><SelectValue placeholder="Select gender" /></SelectTrigger>
+                <SelectContent><SelectItem value="Male">Male</SelectItem><SelectItem value="Female">Female</SelectItem><SelectItem value="Other">Other</SelectItem></SelectContent>
               </Select>
             </div>
-          )}
+          </div>
 
           <div className="space-y-2">
-            <Label htmlFor="stream">Stream *</Label>
-            <Select value={formData.stream} onValueChange={(value) => updateField("stream", value)}>
-              <SelectTrigger id="stream"><SelectValue placeholder="Select stream" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Science">Science</SelectItem>
-                <SelectItem value="Commerce">Commerce</SelectItem>
-                <SelectItem value="Arts">Arts</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label htmlFor="bio" className="text-sm font-semibold text-gray-300">Bio *</Label>
+            <Textarea id="bio" value={formData.bio} onChange={(e) => updateField("bio", e.target.value)} maxLength={150} placeholder="Tell us a bit about yourself" className={`${inputStyles} min-h-[100px]`} />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="city">City *</Label>
-              <Input id="city" value={formData.city} onChange={(e) => updateField("city", e.target.value)} />
+              <Label htmlFor="class" className="text-sm font-semibold text-gray-300">Class *</Label>
+              <Select value={formData.class} onValueChange={(value) => { updateField("class", value); updateField("exam", ""); }}>
+                <SelectTrigger id="class" className={inputStyles}><SelectValue placeholder="Select class" /></SelectTrigger>
+                <SelectContent><SelectItem value="9">9th</SelectItem><SelectItem value="10">10th</SelectItem><SelectItem value="11">11th</SelectItem><SelectItem value="12">12th</SelectItem><SelectItem value="Competitive">Competitive</SelectItem></SelectContent>
+              </Select>
             </div>
+            {formData.class && (
             <div className="space-y-2">
-              <Label htmlFor="state">State *</Label>
-              <Input id="state" value={formData.state} onChange={(e) => updateField("state", e.target.value)} />
+              <Label htmlFor="exam" className="text-sm font-semibold text-gray-300">Exam *</Label>
+              <Select value={formData.exam} onValueChange={(value) => updateField("exam", value)}>
+                <SelectTrigger id="exam" className={inputStyles}><SelectValue placeholder="Select exam" /></SelectTrigger>
+                <SelectContent>{getExamOptions().map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}</SelectContent>
+              </Select>
             </div>
+            )}
             <div className="space-y-2">
-              <Label htmlFor="country">Country *</Label>
-              <Input id="country" value={formData.country} onChange={(e) => updateField("country", e.target.value)} />
+              <Label htmlFor="stream" className="text-sm font-semibold text-gray-300">Stream *</Label>
+              <Select value={formData.stream} onValueChange={(value) => updateField("stream", value)}>
+                <SelectTrigger id="stream" className={inputStyles}><SelectValue placeholder="Select stream" /></SelectTrigger>
+                <SelectContent><SelectItem value="Science">Science</SelectItem><SelectItem value="Commerce">Commerce</SelectItem><SelectItem value="Arts">Arts</SelectItem></SelectContent>
+              </Select>
             </div>
           </div>
-        </CardContent>
-        <CardFooter>
-          <Button onClick={handleSubmit} className="w-full" disabled={isPending}>
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Submit Onboarding
-          </Button>
-        </CardFooter>
-      </Card>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="city" className="text-sm font-semibold text-gray-300">City *</Label>
+              <Input id="city" value={formData.city} onChange={(e) => updateField("city", e.target.value)} className={inputStyles} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="state" className="text-sm font-semibold text-gray-300">State *</Label>
+              <Input id="state" value={formData.state} onChange={(e) => updateField("state", e.target.value)} className={inputStyles} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="country" className="text-sm font-semibold text-gray-300">Country *</Label>
+              <Input id="country" value={formData.country} onChange={(e) => updateField("country", e.target.value)} className={inputStyles} />
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8">
+            <Button
+              onClick={handleSubmit}
+              disabled={isPending}
+              className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-black py-4 rounded-2xl shadow-lg hover:shadow-cyan-500/25 transition disabled:opacity-70 text-lg"
+            >
+              {isPending ? (
+                <div className="flex items-center justify-center">
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  <span>Submitting...</span>
+                </div>
+              ) : (
+                "Submit Onboarding"
+              )}
+            </Button>
+        </div>
+      </div>
     </div>
   );
 }

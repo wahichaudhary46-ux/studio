@@ -88,7 +88,7 @@ export default function LoginPage() {
             <form onSubmit={handleLogin} className="space-y-5">
               <input
                 type="tel"
-                placeholder="Phone Number (e.g., +919876543210)"
+                placeholder="Phone No"
                 required
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
