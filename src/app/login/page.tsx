@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { auth, db } from '@/lib/firebase';
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -11,75 +11,62 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
+
     try {
       const result = await signInWithEmailAndPassword(auth, formData.email, formData.password);
       const docSnap = await getDoc(doc(db, "students", result.user.uid));
-      router.push(docSnap.exists() ? '/dashboard' : '/onboarding');
+      
+      if (docSnap.exists()) {
+        router.push('/dashboard');
+      } else {
+        router.push('/onboarding');
+      }
     } catch (err: any) {
-      if (err.code === 'auth/user-not-found') setError("No account found.");
-      else if (err.code === 'auth/wrong-password') setError("Incorrect password.");
-      else if (err.code === 'auth/invalid-email') setError("Invalid email address.");
-      else setError("Invalid Email or Password");
+      if (err.code === 'auth/user-not-found') {
+        setError("No account found with this email address.");
+      } else if (err.code === 'auth/wrong-password') {
+        setError("Incorrect password. Please try again.");
+      } else if (err.code === 'auth/invalid-email') {
+        setError("Please enter a valid email address.");
+      } else {
+        setError("Invalid Email or Password");
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGoogleLogin = async () => {
-    setError('');
-    setIsGoogleLoading(true);
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const userDocRef = doc(db, "students", user.uid);
-      const docSnap = await getDoc(userDocRef);
-      if (!docSnap.exists()) {
-        await setDoc(userDocRef, {
-          email: user.email,
-          name: user.displayName || '',
-          profilePic: user.photoURL || '',
-          createdAt: serverTimestamp(),
-        }, { merge: true });
-        router.push('/onboarding');
-      } else {
-        router.push('/dashboard');
-      }
-    } catch (err: any) {
-      console.error(err);
-      setError("Google sign-in failed. Please try again.");
-    } finally {
-      setIsGoogleLoading(false);
-    }
-  };
-
-  const handleForgotPassword = () => router.push('/forgot-password');
-
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Neon grid background */}
-      <div className="absolute inset-0 bg-[radial-gradient(#00ffff11_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
-      
-      {/* Animated neon orbs */}
-      <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-500 rounded-full blur-[100px] opacity-20 animate-pulse"></div>
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-600 rounded-full blur-[120px] opacity-20 animate-pulse delay-700"></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/30 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-indigo-500/5 to-transparent"></div>
+      </div>
 
-      <div className="relative w-full max-w-md">
-        {/* Neon glow card */}
-        <div className="relative bg-black/60 backdrop-blur-xl rounded-3xl border border-cyan-500/30 shadow-[0_0_30px_rgba(0,255,255,0.2)] transition-all duration-500 hover:shadow-[0_0_50px_rgba(0,255,255,0.4)]">
-          <div className="absolute -inset-[1px] bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-3xl blur-md opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+      {/* 3D Card Container */}
+      <div className="relative perspective-1000 w-full max-w-md">
+        <div className="relative transform-gpu transition-all duration-500 hover:rotate-y-2 hover:rotate-x-2 hover:shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-[35px] blur-2xl transform translate-y-4"></div>
           
-          <div className="relative p-8">
-            {/* Neon Text Header */}
-            <div className="text-center mb-8">
-              <h1 className="text-4xl md:text-5xl font-black">
-                <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent animate-pulse">
+          <div className="relative bg-white/5 backdrop-blur-xl border border-white/20 rounded-[35px] p-8 shadow-2xl shadow-black/30 transition-all duration-300 hover:shadow-blue-500/10">
+            
+            {/* Logo + Brand */}
+            <div className="text-center mb-6">
+              {/* Small Logo Icon */}
+              <div className="flex justify-center mb-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-[0_0_15px_#00ffff66]">
+                  <span className="text-white text-2xl font-black">N</span>
+                </div>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-black">
+                <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
                   NEXA
                 </span>
                 <span className="text-white"> </span>
@@ -87,82 +74,81 @@ export default function LoginPage() {
                   LIBRARY
                 </span>
               </h1>
-              <div className="h-1 w-24 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto mt-3 rounded-full shadow-[0_0_8px_#00ffff]"></div>
+              <div className="h-1 w-20 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto mt-3 rounded-full shadow-[0_0_6px_#00ffff]"></div>
             </div>
 
+            {/* Error Message */}
             {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl backdrop-blur-sm">
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-2xl backdrop-blur-sm">
                 <p className="text-red-400 text-xs text-center font-medium">{error}</p>
               </div>
             )}
 
+            {/* Email/Password Form - Only login method */}
             <form onSubmit={handleLogin} className="space-y-5">
-              <div>
-                <input
-                  type="email"
-                  placeholder="Email ID"
-                  required
-                  className="w-full p-4 bg-white/5 border border-cyan-500/30 rounded-xl text-white placeholder:text-gray-400 outline-none transition-all duration-300 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 focus:shadow-[0_0_12px_#00ffff]"
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  disabled={isLoading}
-                />
+              <div className="group">
+                <div className="relative">
+                  <input
+                    type="email"
+                    placeholder="Email ID"
+                    required
+                    className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-gray-400 outline-none transition-all duration-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    disabled={isLoading}
+                  />
+                </div>
               </div>
-              <div>
-                <input
-                  type="password"
-                  placeholder="Password"
-                  required
-                  className="w-full p-4 bg-white/5 border border-cyan-500/30 rounded-xl text-white placeholder:text-gray-400 outline-none transition-all duration-300 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 focus:shadow-[0_0_12px_#00ffff]"
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  disabled={isLoading}
-                />
+
+              <div className="group">
+                <div className="relative">
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    required
+                    className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-gray-400 outline-none transition-all duration-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    disabled={isLoading}
+                  />
+                </div>
               </div>
+
               <button
                 type="submit"
                 disabled={isLoading}
-                className="relative w-full group overflow-hidden rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 p-[1px] transition-all duration-300 hover:shadow-[0_0_20px_#00ffff] disabled:opacity-70"
+                className="relative w-full group overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-600 p-[1px] transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/25 disabled:opacity-70"
               >
-                <div className="relative flex items-center justify-center gap-2 w-full rounded-xl py-4 text-white font-black text-lg tracking-wider group-hover:scale-[1.02] transition-all">
-                  {isLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : "LOGIN"}
+                <div className="relative flex items-center justify-center gap-2 w-full bg-gradient-to-r from-cyan-600 to-blue-600 rounded-2xl py-4 text-white font-black text-lg transition-all duration-300 group-hover:scale-[1.02]">
+                  {isLoading ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  ) : (
+                    "LOGIN"
+                  )}
                 </div>
               </button>
             </form>
 
-            <div className="relative flex items-center my-6">
-              <div className="flex-grow border-t border-cyan-500/30"></div>
-              <span className="mx-4 text-cyan-400 text-sm font-mono">OR</span>
-              <div className="flex-grow border-t border-cyan-500/30"></div>
-            </div>
-
-            <button
-              onClick={handleGoogleLogin}
-              disabled={isGoogleLoading}
-              className="w-full flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-cyan-500/30 rounded-xl py-3 px-4 transition-all duration-300 group disabled:opacity-70 hover:shadow-[0_0_12px_#00ffff]"
-            >
-              {isGoogleLoading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              ) : (
-                <>
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                    <path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                    <path fill="#fff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                    <path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                  </svg>
-                  <span className="text-white font-medium">Continue with Google</span>
-                </>
-              )}
-            </button>
-            
-            <p className="text-gray-400 text-center mt-6 text-sm border-t border-cyan-500/30 pt-5 font-mono">
+            {/* Sign Up Redirect - No Google, no Forgot Password */}
+            <p className="text-gray-500 text-center mt-8 text-sm border-t border-white/10 pt-6">
               New user?{' '}
-              <Link href="/signup" className="text-cyan-400 font-bold hover:text-cyan-300 transition-colors hover:shadow-[0_0_6px_cyan]">
+              <Link href="/signup" className="text-cyan-500 font-bold hover:text-cyan-400 transition-colors">
                 Create Account
               </Link>
             </p>
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .perspective-1000 {
+          perspective: 1000px;
+        }
+        .rotate-y-2 {
+          transform: rotateY(2deg) rotateX(2deg);
+        }
+        .hover\\:rotate-y-2:hover {
+          transform: rotateY(2deg) rotateX(2deg);
+        }
+      `}</style>
     </div>
   );
 }
