@@ -1,90 +1,60 @@
 'use client';
 
 import { useState } from 'react';
-import { auth, db } from '@/lib/firebase';
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { auth } from '@/lib/firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ email: '', password: '', confirmPassword: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
-  // Forgot Password Modal State
-  const [resetModalOpen, setResetModalOpen] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
-  const [resetMessage, setResetMessage] = useState('');
-  const [resetError, setResetError] = useState('');
-  const [resetLoading, setResetLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
     setError('');
     setLoading(true);
     try {
-      const result = await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      const docSnap = await getDoc(doc(db, "students", result.user.uid));
-      
-      if (docSnap.exists()) {
-        router.push('/dashboard');
-      } else {
-        router.push('/onboarding');
-      }
+      await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      // After signup, user is automatically logged in. The root page will handle
+      // redirecting to /onboarding for new users.
+      router.push('/'); 
     } catch (err: any) {
-      setError("Invalid Email or Password");
+      if (err.code === 'auth/email-already-in-use') {
+        setError("An account with this email already exists.");
+      } else if (err.code === 'auth/weak-password') {
+          setError("Password should be at least 6 characters.");
+      }
+      else {
+        setError("Failed to create an account. Please try again.");
+      }
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleForgotPassword = async () => {
-    if (!resetEmail) {
-      setResetError("Please enter your email address");
-      return;
-    }
-    setResetLoading(true);
-    setResetError('');
-    setResetMessage('');
-    try {
-      await sendPasswordResetEmail(auth, resetEmail);
-      setResetMessage(`Password reset link sent to ${resetEmail}. Check your inbox.`);
-      setTimeout(() => {
-        setResetModalOpen(false);
-        setResetEmail('');
-        setResetMessage('');
-      }, 3000);
-    } catch (err: any) {
-      if (err.code === 'auth/user-not-found') {
-        setResetError("No account found with this email");
-      } else {
-        setResetError("Failed to send reset email. Please try again.");
-      }
-    } finally {
-      setResetLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated background elements */}
       <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
       <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-[100px] animate-pulse"></div>
       <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-500/10 rounded-full blur-[120px] animate-pulse delay-1000"></div>
 
-      {/* Main Card */}
       <div className="relative w-full max-w-md transform transition-all duration-500 hover:scale-[1.02]">
         <div className="bg-white/5 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl shadow-black/30 hover:shadow-blue-500/5 transition-all duration-300">
-          {/* Brand & Header */}
           <div className="text-center mb-6">
             <h1 className="text-5xl font-black bg-gradient-to-r from-white to-blue-400 bg-clip-text text-transparent tracking-tight">
               NEXA<span className="text-blue-500">PRO</span>
             </h1>
             <div className="mt-3 inline-block px-4 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 backdrop-blur-sm">
-              <p className="text-blue-300 text-xs font-bold tracking-wider">MEMBER LOGIN</p>
+              <p className="text-blue-300 text-xs font-bold tracking-wider">CREATE ACCOUNT</p>
             </div>
           </div>
 
@@ -94,7 +64,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleSignup} className="space-y-5">
             <div className="group">
               <label className="block text-gray-400 text-xs font-semibold mb-1 ml-1">EMAIL ID</label>
               <input 
@@ -136,6 +106,18 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
+            
+            <div className="group">
+              <label className="block text-gray-400 text-xs font-semibold mb-1 ml-1">CONFIRM PASSWORD</label>
+              <input 
+                type="password" 
+                placeholder="••••••••" 
+                required 
+                className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-600"
+                onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                value={formData.confirmPassword}
+              />
+            </div>
 
             <button 
               type="submit" 
@@ -145,89 +127,24 @@ export default function LoginPage() {
               {loading ? (
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  <span>AUTHENTICATING...</span>
+                  <span>CREATING ACCOUNT...</span>
                 </div>
               ) : (
-                "LOGIN NOW"
+                "SIGN UP"
               )}
             </button>
           </form>
 
-          {/* Forgot Password Link */}
-          <div className="text-center mt-5">
-            <button 
-              onClick={() => {
-                setResetEmail(formData.email);
-                setResetModalOpen(true);
-              }}
-              className="text-sm text-gray-400 hover:text-blue-400 transition-colors font-medium group inline-flex items-center gap-1"
-            >
-              Forgot Password?
-              <span className="group-hover:translate-x-0.5 transition-transform">→</span>
-            </button>
-          </div>
-
           <div className="mt-8 pt-5 border-t border-white/10 text-center">
             <p className="text-gray-500 text-sm">
-              New user?{' '}
-              <Link href="/signup" className="text-blue-400 font-bold hover:text-blue-300 transition-colors underline underline-offset-2 decoration-blue-500/30">
-                Create Account
+              Already have an account?{' '}
+              <Link href="/login" className="text-blue-400 font-bold hover:text-blue-300 transition-colors underline underline-offset-2 decoration-blue-500/30">
+                Log In
               </Link>
             </p>
           </div>
         </div>
       </div>
-
-      {/* Forgot Password Modal */}
-      {resetModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fadeIn">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-white/20 rounded-2xl w-full max-w-md p-6 shadow-2xl transform transition-all scale-100">
-            <h3 className="text-2xl font-bold text-white mb-2">Reset Password</h3>
-            <p className="text-gray-400 text-sm mb-5">We'll send a password reset link to your email.</p>
-            
-            {resetMessage ? (
-              <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-3 rounded-xl text-sm mb-4">
-                {resetMessage}
-              </div>
-            ) : (
-              <>
-                <input 
-                  type="email" 
-                  placeholder="Your email address" 
-                  value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
-                  className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-blue-500 transition-all mb-4"
-                  autoFocus
-                />
-                {resetError && <p className="text-red-400 text-xs mb-3 -mt-2">{resetError}</p>}
-                <div className="flex gap-3">
-                  <button 
-                    onClick={() => {
-                      setResetModalOpen(false);
-                      setResetError('');
-                      setResetMessage('');
-                    }}
-                    className="flex-1 py-2.5 rounded-xl border border-white/20 text-gray-300 hover:bg-white/5 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    onClick={handleForgotPassword}
-                    disabled={resetLoading}
-                    className="flex-1 py-2.5 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-500 transition-colors disabled:opacity-70"
-                  >
-                    {resetLoading ? (
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto"></div>
-                    ) : (
-                      "Send Reset Link"
-                    )}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
 
       <style jsx>{`
         @keyframes fadeIn {
