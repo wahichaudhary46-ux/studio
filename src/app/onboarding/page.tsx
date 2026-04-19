@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { completeOnboardingAction } from "@/actions/user.actions";
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,9 +20,9 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2 } from "lucide-react";
 
-// The form data structure
 const initialFormData = {
   name: "",
   profilePic: null as string | null,
@@ -45,17 +47,33 @@ export default function OnboardingPage() {
 
   const [formData, setFormData] = useState(initialFormData);
 
-  // Load from localStorage
+  // Fetch existing data from Firestore or LocalStorage on mount
   useEffect(() => {
     if (user) {
-      const saved = localStorage.getItem(`onboardingData_${user.uid}`);
-      if (saved) {
-        setFormData(JSON.parse(saved));
-      }
+      const fetchData = async () => {
+        const saved = localStorage.getItem(`onboardingData_${user.uid}`);
+        let existingData: Partial<typeof initialFormData> = {};
+        
+        if (saved) {
+          existingData = JSON.parse(saved);
+        } else {
+          const userDocRef = doc(db, 'students', user.uid);
+          const docSnap = await getDoc(userDocRef);
+          if (docSnap.exists()) {
+            const dbData = docSnap.data();
+            existingData = { 
+              name: dbData.name || '',
+              profilePic: dbData.profilePic || null,
+            };
+          }
+        }
+        setFormData(prev => ({...prev, ...existingData}));
+      };
+      fetchData();
     }
   }, [user]);
 
-  // Save to localStorage
+  // Save to localStorage whenever formData changes
   useEffect(() => {
     if (user) {
       localStorage.setItem(`onboardingData_${user.uid}`, JSON.stringify(formData));
@@ -148,16 +166,24 @@ export default function OnboardingPage() {
           <CardDescription>Fill in the details below to get started.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name *</Label>
-            <Input id="name" value={formData.name} onChange={(e) => handleNamePicChange("name", e.target.value)} disabled={!canUpdateNamePic() && formData.name !== ""} />
-            {!canUpdateNamePic() && formData.name && <p className="text-xs text-destructive">Name can be changed only after 1 year.</p>}
+          <div className="flex items-center gap-4">
+            {formData.profilePic && (
+              <Avatar className="h-16 w-16">
+                <AvatarImage src={formData.profilePic} alt={formData.name} />
+                <AvatarFallback>{formData.name?.charAt(0)}</AvatarFallback>
+              </Avatar>
+            )}
+            <div className="space-y-2 flex-1">
+              <Label htmlFor="name">Name *</Label>
+              <Input id="name" value={formData.name} onChange={(e) => handleNamePicChange("name", e.target.value)} disabled={!canUpdateNamePic() && formData.name !== ""} />
+              {!canUpdateNamePic() && formData.name && <p className="text-xs text-destructive">Name can be changed only after 1 year.</p>}
+            </div>
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="profilePic">Profile Picture</Label>
+            <Label htmlFor="profilePic">Update Profile Picture</Label>
             <Input id="profilePic" type="file" accept="image/*" onChange={(e) => handleNamePicChange("profilePic", e.target.files?.[0]?.name || null)} disabled={!canUpdateNamePic() && !!formData.profilePic} />
-             {formData.profilePic && <p className="text-sm text-muted-foreground">Current: {formData.profilePic}</p>}
+             {formData.profilePic && typeof formData.profilePic === 'string' && !formData.profilePic.startsWith('http') && <p className="text-sm text-muted-foreground">Current file: {formData.profilePic}</p>}
           </div>
 
           <div className="space-y-2">
